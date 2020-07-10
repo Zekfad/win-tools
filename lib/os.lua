@@ -151,7 +151,9 @@ function os.getDirSync(path)
 	local dir = {}
 	while coroutine.status(handler) ~= 'dead' do
 		local status, entry = coroutine.resume(handler, path)
-		table.insert(dir, entry)
+		if entry then
+			table.insert(dir, entry)
+		end
 	end
 	return dir
 end
