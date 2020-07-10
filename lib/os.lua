@@ -45,3 +45,9 @@ function os.filesize(obj)
 	handle:seek('set', current)
 	return size, handle
 end
+
+--- Check if we're on Windows
+--- @return boolean
+function os.isWin32()
+	return package.config:sub(1,1) == '\\'
+end
