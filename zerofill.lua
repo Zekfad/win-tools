@@ -6,8 +6,8 @@
 	ISC Licensed
 ]]
 
-require 'lib.os';
-require 'lib.console';
+require 'lib.os'
+require 'lib.console'
 require 'lib.progress'
 
 local filename = arg[1];
