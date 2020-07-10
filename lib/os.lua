@@ -63,8 +63,8 @@ function os.hasAccess(path)
 	if os.exists(path) then
 		local handle = io.open(path, 'r')
 		local result = toboolean(handle)
-		io.close(handle)
 		if result then
+			io.close(handle)
 			return true
 		end
 	end
@@ -95,4 +95,63 @@ function os.filesize(file)
 	end
 
 	return size
+end
+
+--- Get directory listening.
+--- Returns table with following fields:
+--- ```lua
+--- { name = string, type = number, size = number }
+--- ```
+--- @param path string
+--- @return thread
+function os.getDirAsync(path)
+	local function handler(path)
+		if os.isDir(path) then
+			local pipe = io.popen(
+				string.format(
+					'dir %s %q',
+					os.isWin32()
+						and '/B /A'
+						or '-bA1',
+					path
+				),
+				'r'
+			)
+			for object in pipe:lines() do
+				if not (object == '.' or object == '..') then
+					local objectPath = path .. '/' .. object
+					local size = os.filesize(objectPath)
+
+					coroutine.yield({
+						name = object,
+						size = size,
+						type = size ~= -1
+							and 0
+							or 1,
+					})
+				end
+			end
+
+			pipe:close()
+		end
+		return
+	end
+	return coroutine.create(handler)
+end
+
+--- Get directory listening.
+--- Returns table with subtables with following format:
+--- ```lua
+--- { name = string, type = number, size = number }
+--- ```
+--- @param path string
+--- @return table
+function os.getDirSync(path)
+	local handler = os.getDirAsync(path)
+	local dir = {}
+	while coroutine.status(handler) ~= 'dead' do
+		local status, entry = coroutine.resume(handler, path)
+		table.insert(dir, entry)
+	end
+	return dir
 end
