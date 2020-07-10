@@ -1,4 +1,5 @@
-require 'lib/table'
+require 'lib.table'
+require 'lib.types'
 
 --- Console object.
 console = {}
@@ -42,6 +43,13 @@ end
 --- @param variants table
 --- @param default integer
 function console.confirm(message, variants, default)
+	if not types.check({
+		[{ 'string', }] = message or types.null,
+		[{ { 'string', }, }] = variants or types.null,
+		[{ 'number', }] = default or types.null,
+	}) then
+		return default
+	end
 	local lowerVariants = {}
 
 	io.write(message, ' [')

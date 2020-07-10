@@ -1,4 +1,5 @@
 require 'table'
+require 'lib.types'
 
 --- Check if table is contains value.
 --- @param tbl table
@@ -6,6 +7,12 @@ require 'table'
 --- @return boolean
 --- @return integer
 function table.contains(tbl, val)
+	if not types.check({
+		[{ 'table', }] = tbl or types.null,
+		[{ 'any', }] = val or types.null,
+	}) then
+		return false, -1
+	end
 	for i, v in ipairs(tbl) do
 		if v == val then
 			return true, i

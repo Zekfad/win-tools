@@ -1,4 +1,5 @@
 require 'lib.global'
+require 'lib.types'
 
 --- Check if we're on Windows
 --- @return boolean
@@ -11,6 +12,11 @@ end
 --- @return boolean
 --- @return string
 function os.exists(path)
+	if not types.check({
+		[{ 'string', }] = path or types.null,
+	}) then
+		return false, 'ERR_NO_PATH'
+	end
 	local ok, err, code = os.rename(path, path)
 	if not ok then
 		if code == 13 then
